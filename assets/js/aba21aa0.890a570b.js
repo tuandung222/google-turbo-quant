@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkturboquant_lectures=self.webpackChunkturboquant_lectures||[]).push([["3747"],{7093(u){u.exports=JSON.parse('{"name":"docusaurus-plugin-content-docs","id":"default"}')}}]);

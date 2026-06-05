@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkturboquant_lectures=self.webpackChunkturboquant_lectures||[]).push([["6079"],{6402(e,t,u){u.d(t,{createArchitectureServices:()=>r.S});var r=u(5016);u(9302)}}]);
