@@ -67,6 +67,9 @@ const config: Config = {
   ],
 
   themeConfig: {
+    metadata: [
+      {name: 'robots', content: 'noindex, nofollow'},
+    ],
     image: 'img/docusaurus-social-card.jpg',
     colorMode: {
       defaultMode: 'dark',
