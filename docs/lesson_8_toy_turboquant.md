@@ -1,9 +1,9 @@
 ---
 sidebar_position: 9
-sidebar_label: "Bài 8: Thực hành — Toy TurboQuant"
+sidebar_label: "Bài 8: Thực hành - Toy TurboQuant"
 ---
 
-# Bài 8: Thực hành — Tự xây dựng Toy TurboQuant
+# Bài 8: Thực hành - Tự xây dựng Toy TurboQuant
 
 Lý thuyết đã đủ. Giờ ta **tự code** toàn bộ TurboQuant bằng Python & NumPy để **kiểm chứng** ba tuyên bố cốt lõi đã học: (1) random rotation diệt outlier & bảo toàn hình học, (2) méo MSE gần cận tối ưu với hằng số ~2.72, (3) QJL cho ước lượng inner product **không thiên lệch**. Mã nguồn nằm trong thư mục [`toy_quant/`](https://github.com/tuandung222/vllm-architecture-lectures/tree/main/turboquant-lectures/toy_quant).
 
@@ -35,7 +35,7 @@ python3 benchmark.py     # méo vs lý thuyết + NNS
 
 ---
 
-## 2. Trụ cột 1 — Random Rotation (`rotation.py`)
+## 2. Trụ cột 1 - Random Rotation (`rotation.py`)
 
 Điểm cốt lõi là **Fast Walsh–Hadamard Transform** $O(d\log d)$ và tính chất $\text{FWHT}(\text{FWHT}(a)) = d\cdot a$, cho phép đảo ngược dễ dàng:
 
@@ -65,11 +65,11 @@ Max|tọa độ| sau xoay   : 1.419       ← outlier bị trải đều!
 
 ---
 
-## 3. Trụ cột 2 — MSE Scalar Quantizer (`quantizer.py`)
+## 3. Trụ cột 2 - MSE Scalar Quantizer (`quantizer.py`)
 
 `ScalarQuantizer` học bảng Lloyd–Max **một lần** trên mẫu Gauss (data-oblivious), bằng cách lặp hai điều kiện centroid + nearest-neighbor (vectorize bằng `np.bincount`).
 
-**Kết quả chạy thực tế** — méo bám sát công thức $2.72\cdot 2^{-2b}$:
+**Kết quả chạy thực tế** - méo bám sát công thức $2.72\cdot 2^{-2b}$:
 
 ```text
  bits   D thực nghiệm     2.72*2^-2b   tỷ lệ/Shannon
@@ -83,7 +83,7 @@ Max|tọa độ| sau xoay   : 1.419       ← outlier bị trải đều!
 
 ---
 
-## 4. Trụ cột 3 — QJL khử bias (`turboquant.py`)
+## 4. Trụ cột 3 - QJL khử bias (`turboquant.py`)
 
 Đây là thí nghiệm **thuyết phục nhất**. Ta nén một key $k$, rồi ước lượng $\langle q, k\rangle$ với các query $q$ **tương quan** với $k$ (đúng tình huống self-attention), **có** và **không có** QJL:
 
@@ -108,7 +108,7 @@ Có   QJL  : bias=-0.0025  (đã khử bias)
 > ✅ **Chính xác như Bài 4!** Bộ lượng hóa MSE co giá trị về trọng tâm → ước lượng tích vô hướng **thấp một cách hệ thống** (bias $= -4.2$). Thêm **1-bit QJL trên residual** đưa bias về **gần 0** ($-0.0025$). Đây là bằng chứng số học cho tuyên bố "*unbiased inner product quantizer*" của paper.
 
 > [!NOTE]
-> Lưu ý quan trọng: bias **chỉ lộ ra khi query tương quan với key**. Nếu bạn thử với query ngẫu nhiên độc lập, $\mathbb E[\langle q, e\rangle]=0$ và sẽ **không** thấy bias — đó là lý do nhiều người bỏ sót vấn đề này. Attention thực tế có query/key tương quan, nên bias là **có thật và quan trọng**.
+> Lưu ý quan trọng: bias **chỉ lộ ra khi query tương quan với key**. Nếu bạn thử với query ngẫu nhiên độc lập, $\mathbb E[\langle q, e\rangle]=0$ và sẽ **không** thấy bias - đó là lý do nhiều người bỏ sót vấn đề này. Attention thực tế có query/key tương quan, nên bias là **có thật và quan trọng**.
 
 ---
 
@@ -128,13 +128,13 @@ FP16 baseline: 256.0 KB (K+V)
   2.0      40.0K   6.4x  6.255e-01     31.0%          7.8735
 ```
 
-> ✅ Nén KV Cache **3.6×–6.4×** so với FP16. Sai số tái tạo Key tăng đều đặn (6 dB/bit), khớp với vùng "trung tính 3.5 bit, suy giảm biên 2.5 bit" mà paper báo cáo — và là tỷ lệ nén bạn sẽ thu được khi thay FP16/FP8 KV bằng TurboQuant trong vLLM (Bài 5).
+> ✅ Nén KV Cache **3.6×–6.4×** so với FP16. Sai số tái tạo Key tăng đều đặn (6 dB/bit), khớp với vùng "trung tính 3.5 bit, suy giảm biên 2.5 bit" mà paper báo cáo - và là tỷ lệ nén bạn sẽ thu được khi thay FP16/FP8 KV bằng TurboQuant trong vLLM (Bài 5).
 
 ---
 
 ## 6. Benchmark & Nearest Neighbor Search (`benchmark.py`)
 
-Cuối cùng, demo ứng dụng thứ hai (Bài 7) — tìm kiếm lân cận gần nhất trên CSDL $5000$ vector $256$ chiều:
+Cuối cùng, demo ứng dụng thứ hai (Bài 7) - tìm kiếm lân cận gần nhất trên CSDL $5000$ vector $256$ chiều:
 
 ```text
 == (2) Nearest Neighbor Search (MIPS), dim=256, DB=5000, top-10 ==
@@ -142,11 +142,11 @@ Thời gian indexing 5000 vector : 2866.8 ms (chỉ rotate+quantize, KHÔNG K-me
 Recall@10 ở 4.0 bit         : 83.9%
 ```
 
-> ✅ "Indexing" chỉ là **encode mỗi vector** — **không có bước K-means**. Đây chính là lợi thế "indexing tức thời" của TurboQuant so với Product Quantization (Bài 7). Recall@10 đạt **~84%** ở chỉ 4 bit/tọa độ (nén $8\times$ so với FP32), nhờ ước lượng inner product unbiased.
+> ✅ "Indexing" chỉ là **encode mỗi vector** - **không có bước K-means**. Đây chính là lợi thế "indexing tức thời" của TurboQuant so với Product Quantization (Bài 7). Recall@10 đạt **~84%** ở chỉ 4 bit/tọa độ (nén $8\times$ so với FP32), nhờ ước lượng inner product unbiased.
 
 > [!TIP]
 > Bài tập mở rộng cho bạn:
-> 1. Viết một baseline **uniform INT4 KV (không xoay)** và so sánh MSE — bạn sẽ thấy outlier phá hỏng nó thế nào.
+> 1. Viết một baseline **uniform INT4 KV (không xoay)** và so sánh MSE - bạn sẽ thấy outlier phá hỏng nó thế nào.
 > 2. Hiện thực một baseline **Product Quantization** bằng `sklearn.cluster.KMeans` và đo thời gian indexing để so trực tiếp với TurboQuant.
 > 3. Thay FWHT giả lập bằng thư viện `scipy.linalg.hadamard` và đo tốc độ ở $d=4096$.
 
@@ -156,14 +156,14 @@ Recall@10 ở 4.0 bit         : 83.9%
 
 Qua 9 bài, ta đã đi trọn vẹn từ lý thuyết tới hiện thực:
 
-* **Bài 0–1**: Bài toán — nén vector chiều cao bảo toàn cả MSE lẫn inner product, **online & data-oblivious**, cho KV Cache.
-* **Bài 2–4**: Ba trụ cột — **random rotation** (Beta/Gauss, diệt outlier), **MSE scalar quantizer** (Lloyd–Max, ~2.72× cận tối ưu), **QJL** (unbiased inner product).
-* **Bài 5**: Tích hợp thực tế vào **vLLM** — hai điểm cắm (write/read), so sánh FP8 KV Cache, custom kernel.
+* **Bài 0–1**: Bài toán - nén vector chiều cao bảo toàn cả MSE lẫn inner product, **online & data-oblivious**, cho KV Cache.
+* **Bài 2–4**: Ba trụ cột - **random rotation** (Beta/Gauss, diệt outlier), **MSE scalar quantizer** (Lloyd–Max, ~2.72× cận tối ưu), **QJL** (unbiased inner product).
+* **Bài 5**: Tích hợp thực tế vào **vLLM** - hai điểm cắm (write/read), so sánh FP8 KV Cache, custom kernel.
 * **Bài 6**: Cận dưới thông tin & hằng số tối ưu $\frac{\sqrt3\pi}{2}\approx 2.72$.
-* **Bài 7**: Ứng dụng **NNS/Vector DB** — indexing tức thời, recall cao.
+* **Bài 7**: Ứng dụng **NNS/Vector DB** - indexing tức thời, recall cao.
 * **Bài 8**: **Tự code & kiểm chứng** mọi tuyên bố bằng NumPy.
 
-> 🎓 TurboQuant là một ví dụ đẹp về việc **một kết quả lý thuyết thông tin chặt chẽ** (rate-distortion + random rotation) trực tiếp tạo ra **giá trị kỹ thuật khổng lồ** — nén KV Cache cho LLM serving và tăng tốc vector database — chỉ với những phép toán đơn giản, rẻ tiền, không cần dữ liệu. Đó chính là vẻ đẹp của việc hiểu thuật toán tới tận gốc rễ thay vì coi nó là hộp đen.
+> 🎓 TurboQuant là một ví dụ đẹp về việc **một kết quả lý thuyết thông tin chặt chẽ** (rate-distortion + random rotation) trực tiếp tạo ra **giá trị kỹ thuật khổng lồ** - nén KV Cache cho LLM serving và tăng tốc vector database - chỉ với những phép toán đơn giản, rẻ tiền, không cần dữ liệu. Đó chính là vẻ đẹp của việc hiểu thuật toán tới tận gốc rễ thay vì coi nó là hộp đen.
 
 ---
 

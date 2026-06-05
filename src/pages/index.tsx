@@ -49,7 +49,7 @@ const CorePillars: FeatureItem[] = [
   {
     title: 'Random Rotation',
     badge: 'Data-Oblivious',
-    description: 'Xoay ngẫu nhiên vector (qua randomized Hadamard transform) khiến mọi tọa độ tuân theo cùng một phân phối Beta đã biết và gần như độc lập — không cần dữ liệu hiệu chỉnh (calibration-free), chạy online.',
+    description: 'Xoay ngẫu nhiên vector (qua randomized Hadamard transform) khiến mọi tọa độ tuân theo cùng một phân phối Beta đã biết và gần như độc lập - không cần dữ liệu hiệu chỉnh (calibration-free), chạy online.',
   },
   {
     title: 'Per-Coordinate Quantizer',
@@ -82,7 +82,7 @@ const Lectures: LectureItem[] = [
   {
     number: 'Bài 1',
     title: 'Bài toán nén KV Cache & yêu cầu Data-Oblivious',
-    desc: 'Vì sao KV Cache là điểm nghẽn VRAM của LLM serving? Phân biệt PTQ tĩnh (calibration) vs lượng hóa online/data-oblivious — yêu cầu cốt lõi mà TurboQuant giải quyết.',
+    desc: 'Vì sao KV Cache là điểm nghẽn VRAM của LLM serving? Phân biệt PTQ tĩnh (calibration) vs lượng hóa online/data-oblivious - yêu cầu cốt lõi mà TurboQuant giải quyết.',
     path: '/docs/lesson_1_kv_cache_problem',
     category: 'Core Theory'
   },
@@ -172,7 +172,7 @@ export default function Home(): ReactNode {
               ⚡ Ba Trụ Cột Của TurboQuant
             </Heading>
             <p style={{ opacity: 0.7, maxWidth: '640px', margin: '0.5rem auto 0 auto' }}>
-              Một thuật toán lượng hóa vector data-oblivious, gần tối ưu về méo, chạy online — không cần calibration.
+              Một thuật toán lượng hóa vector data-oblivious, gần tối ưu về méo, chạy online - không cần calibration.
             </p>
           </div>
 
@@ -244,7 +244,7 @@ export default function Home(): ReactNode {
               💻 Thực Hành: Tự Code "Toy TurboQuant"
             </Heading>
             <p style={{ maxWidth: '720px', margin: '0 auto 2rem auto', opacity: 0.8, lineHeight: '1.6' }}>
-              Không gì giúp hiểu bản chất tốt bằng tự lập trình! Trong Bài 8, chúng ta sẽ hiện thực bằng Python &amp; NumPy toàn bộ đường ống TurboQuant — random rotation, bộ lượng hóa MSE, QJL residual — rồi mô phỏng nén KV Cache và đo đạc sai số MSE cùng độ chính xác tích vô hướng.
+              Không gì giúp hiểu bản chất tốt bằng tự lập trình! Trong Bài 8, chúng ta sẽ hiện thực bằng Python &amp; NumPy toàn bộ đường ống TurboQuant - random rotation, bộ lượng hóa MSE, QJL residual - rồi mô phỏng nén KV Cache và đo đạc sai số MSE cùng độ chính xác tích vô hướng.
             </p>
             <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
               <Link

@@ -52,15 +52,15 @@ Từ phân tích trên, một bộ lượng hóa KV Cache lý tưởng phải đ
 
 1. **Data-Oblivious (calibration-free)**: thuật toán **không** phụ thuộc vào phân phối dữ liệu. Cùng một quy tắc lượng hóa áp cho mọi vector, bất kể nó đến từ prompt nào. → Miễn nhiễm distribution shift.
 2. **Online & rẻ**: chi phí mã hóa mỗi vector phải cực thấp ($O(d \log d)$ trở xuống), không có bước training/indexing nặng.
-3. **Near-optimal distortion**: dù đơn giản, méo vẫn phải gần cận Shannon — nếu không, chất lượng mô hình (perplexity, accuracy) sẽ sụp đổ ở bit thấp.
+3. **Near-optimal distortion**: dù đơn giản, méo vẫn phải gần cận Shannon - nếu không, chất lượng mô hình (perplexity, accuracy) sẽ sụp đổ ở bit thấp.
 
 Trước TurboQuant, người ta thường phải **đánh đổi**: hoặc đơn giản nhưng méo lớn (uniform INT4/INT8 trực tiếp, hỏng ở bit thấp do outlier), hoặc chất lượng tốt nhưng data-dependent (VQ học codebook, không online được).
 
-> 🎯 **TurboQuant phá vỡ sự đánh đổi này**: nó **data-oblivious VÀ near-optimal cùng lúc**. Bí quyết là chuyển độ khó từ "thiết kế codebook thông minh" sang "một phép xoay ngẫu nhiên" — vốn rẻ và không cần dữ liệu.
+> 🎯 **TurboQuant phá vỡ sự đánh đổi này**: nó **data-oblivious VÀ near-optimal cùng lúc**. Bí quyết là chuyển độ khó từ "thiết kế codebook thông minh" sang "một phép xoay ngẫu nhiên" - vốn rẻ và không cần dữ liệu.
 
 ---
 
-## 4. Vấn đề Outlier — kẻ thù số một của lượng hóa trực tiếp
+## 4. Vấn đề Outlier - kẻ thù số một của lượng hóa trực tiếp
 
 Vì sao không thể chỉ làm tròn KV xuống INT4 một cách ngây thơ? Vì các vector activation trong LLM lớn chứa **outlier**: một số ít kênh (channel) có biên độ cực lớn (gấp hàng chục–trăm lần trung bình).
 
@@ -74,7 +74,7 @@ Một vector Key gốc (8 kênh minh họa):
 Nếu chọn thang lượng hóa (scale) đủ lớn để bao trùm $14.7$, thì các giá trị nhỏ ($0.12, -0.05, \dots$) sẽ bị nén hết về cùng một mức → **mất sạch thông tin**. Đây là lý do INT4 ngây thơ làm perplexity tăng vọt.
 
 > [!TIP]
-> **Trực giác cốt lõi của TurboQuant**: Phép **xoay ngẫu nhiên** ở Bài 2 sẽ "**trải đều**" năng lượng của outlier ra khắp $d$ tọa độ. Sau khi xoay, không còn kênh nào đặc biệt lớn — mọi tọa độ có cùng phân phối (Beta, gần Gauss) đẹp đẽ và **không có outlier**. Đây cũng là ý tưởng chung với các phương pháp dùng **Hadamard transform** (QuIP#, QuaRot, SpinQuant), nhưng TurboQuant đẩy nó tới mức **gần tối ưu có chứng minh**.
+> **Trực giác cốt lõi của TurboQuant**: Phép **xoay ngẫu nhiên** ở Bài 2 sẽ "**trải đều**" năng lượng của outlier ra khắp $d$ tọa độ. Sau khi xoay, không còn kênh nào đặc biệt lớn - mọi tọa độ có cùng phân phối (Beta, gần Gauss) đẹp đẽ và **không có outlier**. Đây cũng là ý tưởng chung với các phương pháp dùng **Hadamard transform** (QuIP#, QuaRot, SpinQuant), nhưng TurboQuant đẩy nó tới mức **gần tối ưu có chứng minh**.
 
 ---
 
@@ -82,7 +82,7 @@ Nếu chọn thang lượng hóa (scale) đủ lớn để bao trùm $14.7$, th�
 
 * KV Cache là **điểm nghẽn VRAM** chính của LLM serving; nén nó tăng throughput, context length và tốc độ decode.
 * Nén KV Cache khó hơn nén weights vì phải **online, không calibration, chịu distribution shift**.
-* Một KV quantizer lý tưởng phải **data-oblivious + rẻ + near-optimal** — bộ ba mà các phương pháp cũ phải đánh đổi.
+* Một KV quantizer lý tưởng phải **data-oblivious + rẻ + near-optimal** - bộ ba mà các phương pháp cũ phải đánh đổi.
 * **Outlier** phá hủy lượng hóa trực tiếp; chìa khóa là **xoay ngẫu nhiên để trải đều năng lượng**.
 
-👉 Bài tiếp theo: **[Bài 2 — Random Rotation & Phân phối Beta](./lesson_2_random_rotation_beta.md)**, trụ cột đầu tiên và là "phép màu" toán học của TurboQuant.
+👉 Bài tiếp theo: **[Bài 2 - Random Rotation & Phân phối Beta](./lesson_2_random_rotation_beta.md)**, trụ cột đầu tiên và là "phép màu" toán học của TurboQuant.

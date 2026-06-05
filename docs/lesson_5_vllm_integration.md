@@ -8,7 +8,7 @@ sidebar_label: "Bài 5: Tích hợp TurboQuant vào vLLM"
 Đây là bài "kỹ thuật hệ thống" trọng tâm: ta lấy thuật toán TurboQuant (Bài 2–4) và **ánh xạ nó vào kiến trúc thực tế của vLLM** để nén KV Cache lúc serving. Mục tiêu là chỉ rõ **chính xác** TurboQuant phải "cắm" vào đâu trong đường đi của dữ liệu, những kernel nào cần viết, và so sánh với cơ chế **FP8 KV Cache** mà vLLM đã có sẵn.
 
 > [!NOTE]
-> TurboQuant chưa được merge sẵn trong vLLM upstream (tính tới thời điểm biên soạn). Bài này phân tích **một thiết kế tích hợp** dựa trên kiến trúc vLLM v1 thực tế — coi như một bản "RFC kỹ thuật". Nó cũng là bản đồ để bạn tự prototype.
+> TurboQuant chưa được merge sẵn trong vLLM upstream (tính tới thời điểm biên soạn). Bài này phân tích **một thiết kế tích hợp** dựa trên kiến trúc vLLM v1 thực tế - coi như một bản "RFC kỹ thuật". Nó cũng là bản đồ để bạn tự prototype.
 
 ---
 
@@ -36,9 +36,9 @@ TurboQuant phải chen vào **đúng hai điểm**: lúc **ghi** (mã hóa K/V) 
 
 ---
 
-## 2. Điểm cắm 1 — Mã hóa khi ghi vào cache (Write Path)
+## 2. Điểm cắm 1 - Mã hóa khi ghi vào cache (Write Path)
 
-Thay vì ghi K/V dạng FP16, ta chèn đường ống TurboQuant ngay trước `reshape_and_cache`. **Phép xoay được thực hiện trên chiều head** ($d = d_{\text{head}}$, ví dụ $128$ — rất tiện vì là lũy thừa của 2, hợp với Hadamard):
+Thay vì ghi K/V dạng FP16, ta chèn đường ống TurboQuant ngay trước `reshape_and_cache`. **Phép xoay được thực hiện trên chiều head** ($d = d_{\text{head}}$, ví dụ $128$ - rất tiện vì là lũy thừa của 2, hợp với Hadamard):
 
 ```python
 # Pseudo-code: write path cho MỖI head, mỗi token mới (pha decode)
@@ -59,11 +59,11 @@ def turbo_encode_kv(k_new, v_new):           # k_new, v_new: [d_head] FP16
 ```
 
 > [!IMPORTANT]
-> **Tính data-oblivious là chìa khóa cho serving**: bảng Lloyd-Max và ma trận xoay đều **cố định, không phụ thuộc dữ liệu** (chỉ cần seed). Vì vậy mã hóa mỗi token là $O(d\log d)$, **không có bước calibration/profiling online** — đúng thứ vòng lặp decode cần. Đây chính là lý do TurboQuant phù hợp serving hơn các VQ học codebook.
+> **Tính data-oblivious là chìa khóa cho serving**: bảng Lloyd-Max và ma trận xoay đều **cố định, không phụ thuộc dữ liệu** (chỉ cần seed). Vì vậy mã hóa mỗi token là $O(d\log d)$, **không có bước calibration/profiling online** - đúng thứ vòng lặp decode cần. Đây chính là lý do TurboQuant phù hợp serving hơn các VQ học codebook.
 
 ---
 
-## 3. Điểm cắm 2 — Giải mã trong Attention (Read Path)
+## 3. Điểm cắm 2 - Giải mã trong Attention (Read Path)
 
 Đây là phần khó nhất về kỹ thuật. Khi tính attention, kernel phải "hiểu" KV đã nén. Mấu chốt là tính chất **bảo toàn tích vô hướng** của phép xoay (Bài 2):
 
@@ -104,8 +104,8 @@ vLLM đã hỗ trợ `kv_cache_dtype="fp8"` (E4M3/E5M2). Vậy TurboQuant hơn g
 | Tiêu chí | FP8 KV Cache (vLLM hiện có) | TurboQuant KV Cache |
 | :--- | :--- | :--- |
 | **Bit/kênh** | 8 bit | **2.5 – 3.5 bit** (nén thêm ~2–3×) |
-| **Xử lý outlier** | Kém — outlier "ăn" hết dải động của FP8 | **Tốt** — random rotation trải đều outlier |
-| **Tối ưu inner product** | Không (chỉ là làm tròn dtype) | **Có** — QJL cho ước lượng unbiased |
+| **Xử lý outlier** | Kém - outlier "ăn" hết dải động của FP8 | **Tốt** - random rotation trải đều outlier |
+| **Tối ưu inner product** | Không (chỉ là làm tròn dtype) | **Có** - QJL cho ước lượng unbiased |
 | **Calibration** | Cần scale (per-tensor/per-token) | **Data-oblivious**, chỉ cần seed |
 | **Độ phức tạp kernel** | Thấp (phần cứng hỗ trợ FP8 sẵn) | **Cao** (cần Hadamard + QJL trong kernel) |
 | **Khoảng cách tới tối ưu** | Xa | **Hằng số ~2.72 lần cận Shannon** |
@@ -119,7 +119,7 @@ vLLM đã hỗ trợ `kv_cache_dtype="fp8"` (E4M3/E5M2). Vậy TurboQuant hơn g
 
 Một vài lưu ý hệ thống khi nén KV theo block:
 
-* **Layout block**: mỗi block giờ chứa mã nén (b-bit codes + norm + qjl bits) thay vì FP16. `kv_cache_manager.py` chỉ cần biết **kích thước byte mới mỗi slot** — logic paging (cấp phát/CoW/eviction) **không đổi**, vì TurboQuant chỉ thay đổi *nội dung* slot chứ không phải *cách quản lý* slot.
+* **Layout block**: mỗi block giờ chứa mã nén (b-bit codes + norm + qjl bits) thay vì FP16. `kv_cache_manager.py` chỉ cần biết **kích thước byte mới mỗi slot** - logic paging (cấp phát/CoW/eviction) **không đổi**, vì TurboQuant chỉ thay đổi *nội dung* slot chứ không phải *cách quản lý* slot.
 * **Prefix caching**: vì TurboQuant **data-oblivious** (cùng seed → cùng mã cho cùng vector), hai prefix giống nhau vẫn cho cùng KV nén → **vẫn share block được**. Đây là một điểm cộng so với VQ data-dependent (mã có thể đổi theo lô calibration).
 * **Per-token, không per-tensor**: TurboQuant lượng hóa **mỗi vector K/V độc lập** (rotation trên chiều head). Không cần thống kê toàn cục → hợp hoàn hảo với continuous batching, nơi token đến không đồng bộ.
 
@@ -155,7 +155,7 @@ flowchart LR
 * TurboQuant cắm vào vLLM tại **hai điểm**: mã hóa khi **ghi** (trước `reshape_and_cache`) và giải mã khi **đọc** (trong attention backend).
 * Phép xoay thực hiện **trên chiều head** ($d_{\text{head}}$); vì bảo toàn inner product, **query cũng phải được xoay** bằng cùng $R$.
 * **Key** dùng inner-product mode (QJL), **Value** dùng MSE mode.
-* So với **FP8 KV Cache** có sẵn: TurboQuant nén sâu hơn (2.5–3.5 bit), xử lý outlier tốt hơn, unbiased — đổi lại **độ phức tạp kernel cao hơn**.
+* So với **FP8 KV Cache** có sẵn: TurboQuant nén sâu hơn (2.5–3.5 bit), xử lý outlier tốt hơn, unbiased - đổi lại **độ phức tạp kernel cao hơn**.
 * Logic **PagedAttention/prefix caching không đổi**; TurboQuant data-oblivious nên **vẫn share block** được.
 
-👉 Bài tiếp theo: **[Bài 6 — Cận dưới lý thuyết & Tính tối ưu](./lesson_6_lower_bound_optimality.md)**, chứng minh vì sao hằng số gap đúng bằng ~2.72.
+👉 Bài tiếp theo: **[Bài 6 - Cận dưới lý thuyết & Tính tối ưu](./lesson_6_lower_bound_optimality.md)**, chứng minh vì sao hằng số gap đúng bằng ~2.72.

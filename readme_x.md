@@ -1,4 +1,4 @@
-# TurboQuant Internals — Phân tích thuật toán & Tích hợp vLLM
+# TurboQuant Internals - Phân tích thuật toán & Tích hợp vLLM
 
 > Chuỗi bài giảng tiếng Việt phân tích chuyên sâu thuật toán **TurboQuant** của Google
 > (*"TurboQuant: Online Vector Quantization with Near-optimal Distortion Rate"*,
@@ -24,13 +24,13 @@ xuống **2.5–3.5 bit/kênh**, **data-oblivious**, chạy **online**.
 | :-- | :-- |
 | 0 | Nền tảng Vector Quantization & Rate-Distortion |
 | 1 | Bài toán nén KV Cache & yêu cầu Data-Oblivious |
-| 2 | **Trụ cột 1** — Random Rotation & Phân phối Beta |
-| 3 | **Trụ cột 2** — MSE Scalar Quantizer (Lloyd–Max, ~2.72×) |
-| 4 | **Trụ cột 3** — Inner Product & QJL Unbiased |
+| 2 | **Trụ cột 1** - Random Rotation & Phân phối Beta |
+| 3 | **Trụ cột 2** - MSE Scalar Quantizer (Lloyd–Max, ~2.72×) |
+| 4 | **Trụ cột 3** - Inner Product & QJL Unbiased |
 | 5 | **Tích hợp vào vLLM** KV Cache (PagedAttention, FP8, kernel) |
 | 6 | Cận dưới lý thuyết & Tính tối ưu ($\frac{\sqrt3\pi}{2}\approx 2.72$) |
 | 7 | Ứng dụng Nearest Neighbor Search & Vector DB |
-| 8 | **Thực hành** — Tự code Toy TurboQuant bằng NumPy |
+| 8 | **Thực hành** - Tự code Toy TurboQuant bằng NumPy |
 
 ## 🚀 Chạy site cục bộ
 
@@ -56,8 +56,8 @@ python3 benchmark.py      # méo vs cận dưới; Nearest Neighbor Search
 ## 📖 Tài liệu tham khảo
 
 - Amir Zandieh, Majid Daliri, Majid Hadian, Vahab Mirrokni. *TurboQuant: Online Vector Quantization with Near-optimal Distortion Rate.* [arXiv:2504.19874](https://arxiv.org/abs/2504.19874), ICLR 2026.
-- [vLLM](https://github.com/vllm-project/vllm) — thư viện LLM serving.
-- [vLLM Internals Lectures](https://github.com/tuandung222/vllm-architecture-lectures) — khóa học chị em.
+- [vLLM](https://github.com/vllm-project/vllm) - thư viện LLM serving.
+- [vLLM Internals Lectures](https://github.com/tuandung222/vllm-architecture-lectures) - khóa học chị em.
 
 ---
 

@@ -3,9 +3,9 @@ sidebar_position: 4
 sidebar_label: "Bài 3: MSE Scalar Quantizer tối ưu"
 ---
 
-# Bài 3: Trụ cột 2 — MSE Scalar Quantizer tối ưu
+# Bài 3: Trụ cột 2 - MSE Scalar Quantizer tối ưu
 
-Bài 2 đã biến vector $x$ thành $\tilde x = Rx$ với các tọa độ **i.i.d. xấp xỉ Gauss**. Giờ nhiệm vụ chỉ còn là: thiết kế **một** bộ lượng hóa vô hướng $q^\star$ tối ưu cho phân phối đó, rồi áp cho mọi tọa độ. Bài này trình bày cách thiết kế và — quan trọng nhất — **tính chính xác méo** của nó, từ đó suy ra công thức $D(b)$ then chốt.
+Bài 2 đã biến vector $x$ thành $\tilde x = Rx$ với các tọa độ **i.i.d. xấp xỉ Gauss**. Giờ nhiệm vụ chỉ còn là: thiết kế **một** bộ lượng hóa vô hướng $q^\star$ tối ưu cho phân phối đó, rồi áp cho mọi tọa độ. Bài này trình bày cách thiết kế và - quan trọng nhất - **tính chính xác méo** của nó, từ đó suy ra công thức $D(b)$ then chốt.
 
 ---
 
@@ -22,10 +22,10 @@ Cực tiểu hóa $D$ cho **điều kiện tối ưu Lloyd–Max**:
 2. **Điều kiện lân cận gần nhất (nearest neighbor)**: biên nằm giữa hai mức tái tạo
    $$t_j = \frac{r_j + r_{j+1}}{2}.$$
 
-Lặp xen kẽ hai điều kiện này (thuật toán Lloyd, tương đương K-means 1 chiều) hội tụ về quantizer **tối ưu MSE** cho phân phối $p$. Vì $p$ ở đây **cố định và biết trước** (chuẩn tắc), ta tính $q^\star$ **một lần offline** và nhúng cứng bảng vào code — không cần dữ liệu người dùng. Đây là điều giữ cho thuật toán **data-oblivious**.
+Lặp xen kẽ hai điều kiện này (thuật toán Lloyd, tương đương K-means 1 chiều) hội tụ về quantizer **tối ưu MSE** cho phân phối $p$. Vì $p$ ở đây **cố định và biết trước** (chuẩn tắc), ta tính $q^\star$ **một lần offline** và nhúng cứng bảng vào code - không cần dữ liệu người dùng. Đây là điều giữ cho thuật toán **data-oblivious**.
 
 > [!NOTE]
-> Trong thực tế, người ta thường tách $\tilde x = \lVert x\rVert \cdot \hat u$ thành (a) **độ lớn (norm)** $\lVert x\rVert$ — lượng hóa riêng bằng vài bit, và (b) **hướng** $\hat u$ với các tọa độ phân phối đã biết. TurboQuant lượng hóa norm gần như không mất gì (norm là một số vô hướng duy nhất cho cả vector $d$ chiều).
+> Trong thực tế, người ta thường tách $\tilde x = \lVert x\rVert \cdot \hat u$ thành (a) **độ lớn (norm)** $\lVert x\rVert$ - lượng hóa riêng bằng vài bit, và (b) **hướng** $\hat u$ với các tọa độ phân phối đã biết. TurboQuant lượng hóa norm gần như không mất gì (norm là một số vô hướng duy nhất cho cả vector $d$ chiều).
 
 ---
 
@@ -60,10 +60,10 @@ Câu trả lời nằm ở chỗ **phép xoay đã làm hết việc khó**:
 
 | Nguồn lợi ích của VQ | Sau random rotation? |
 | :--- | :--- |
-| **Shape gain** (khai thác tương quan + hình dạng phân phối) | ❌ Đã bị "tiêu" — các tọa độ giờ **i.i.d. Gauss**, không còn tương quan để khai thác. |
-| **Space-filling gain** (ô Voronoi nhiều chiều lấp đầy tốt hơn hộp) | ✅ Vẫn còn — và đây chính là toàn bộ khoảng cách $2.72$. |
+| **Shape gain** (khai thác tương quan + hình dạng phân phối) | ❌ Đã bị "tiêu" - các tọa độ giờ **i.i.d. Gauss**, không còn tương quan để khai thác. |
+| **Space-filling gain** (ô Voronoi nhiều chiều lấp đầy tốt hơn hộp) | ✅ Vẫn còn - và đây chính là toàn bộ khoảng cách $2.72$. |
 
-Nói cách khác: trong khi VQ tổng quát phải vật lộn với cả tương quan lẫn hình dạng phân phối (đắt, data-dependent), TurboQuant **dùng một phép xoay ngẫu nhiên rẻ tiền để xóa sạch phần khó đó**, chỉ để lại space-filling gain — một khoảng cách hằng số nhỏ mà ta vui vẻ chấp nhận để đổi lấy tính online & data-oblivious.
+Nói cách khác: trong khi VQ tổng quát phải vật lộn với cả tương quan lẫn hình dạng phân phối (đắt, data-dependent), TurboQuant **dùng một phép xoay ngẫu nhiên rẻ tiền để xóa sạch phần khó đó**, chỉ để lại space-filling gain - một khoảng cách hằng số nhỏ mà ta vui vẻ chấp nhận để đổi lấy tính online & data-oblivious.
 
 ---
 
@@ -73,12 +73,12 @@ Từ $D_{\text{SQ}}(b) \approx 2.72\,\sigma^2 2^{-2b}$, quy luật **6 dB/bit** 
 
 | Bit/kênh | Méo tương đối | Chất lượng mô hình (thực nghiệm paper) |
 | :---: | :--- | :--- |
-| **3.5 bit** | rất thấp | **Trung tính tuyệt đối** — gần như không phân biệt được với FP16 |
-| **2.5 bit** | thấp | **Suy giảm biên (marginal)** — chấp nhận được cho hầu hết tác vụ |
+| **3.5 bit** | rất thấp | **Trung tính tuyệt đối** - gần như không phân biệt được với FP16 |
+| **2.5 bit** | thấp | **Suy giảm biên (marginal)** - chấp nhận được cho hầu hết tác vụ |
 | $\le 2$ bit | cao hơn | bắt đầu thấy ảnh hưởng, cần QJL (Bài 4) để giữ attention chính xác |
 
 > [!TIP]
-> Con số **3.5 bit cho chất lượng trung tính** rất ấn tượng: so với FP16 (16 bit) đó là **nén ~4.5×** KV Cache mà gần như không mất chất lượng — trực tiếp tăng batch size / context length lên tương ứng khi serving bằng vLLM (Bài 5).
+> Con số **3.5 bit cho chất lượng trung tính** rất ấn tượng: so với FP16 (16 bit) đó là **nén ~4.5×** KV Cache mà gần như không mất chất lượng - trực tiếp tăng batch size / context length lên tương ứng khi serving bằng vLLM (Bài 5).
 
 ---
 
@@ -86,8 +86,8 @@ Từ $D_{\text{SQ}}(b) \approx 2.72\,\sigma^2 2^{-2b}$, quy luật **6 dB/bit** 
 
 * Thiết kế quantizer vô hướng tối ưu bằng **Lloyd–Max** (centroid + nearest-neighbor), tính **một lần offline** cho phân phối Gauss đã biết → data-oblivious.
 * **Lý thuyết high-rate** cho công thức đóng: $D_{\text{SQ}}(b) = \frac{\sqrt3\pi}{2}\sigma^2 2^{-2b} \approx 2.72\,\sigma^2 2^{-2b}$.
-* Khoảng cách tới cận Shannon là **hằng số $\approx 2.72$**, không đổi theo $b$ và $d$ — nguồn gốc của tuyên bố "near-optimal".
+* Khoảng cách tới cận Shannon là **hằng số $\approx 2.72$**, không đổi theo $b$ và $d$ - nguồn gốc của tuyên bố "near-optimal".
 * Phép xoay đã "tiêu" shape gain, chỉ còn space-filling gain ($=$ hằng số $2.72$) là phần thiếu.
 * Thực nghiệm: **3.5 bit trung tính, 2.5 bit suy giảm biên** cho KV Cache.
 
-👉 Bài tiếp theo: **[Bài 4 — Inner Product & QJL Unbiased](./lesson_4_inner_product_qjl.md)**, xử lý vấn đề thiên lệch khi ước lượng attention scores.
+👉 Bài tiếp theo: **[Bài 4 - Inner Product & QJL Unbiased](./lesson_4_inner_product_qjl.md)**, xử lý vấn đề thiên lệch khi ước lượng attention scores.

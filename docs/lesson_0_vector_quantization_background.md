@@ -27,11 +27,11 @@ Mục tiêu của mọi thuật toán quantization là đẩy điểm hoạt đ�
 
 ## 2. Hai loại Distortion: MSE vs Inner Product
 
-TurboQuant đặc biệt ở chỗ nó tối ưu **cả hai** loại méo dưới đây — điều mà nhiều phương pháp trước bỏ sót.
+TurboQuant đặc biệt ở chỗ nó tối ưu **cả hai** loại méo dưới đây - điều mà nhiều phương pháp trước bỏ sót.
 
 ### 2.1. Mean-Squared Error (MSE) Distortion
 
-Đây là thước đo "hình học" quen thuộc — sai số tái tạo vector:
+Đây là thước đo "hình học" quen thuộc - sai số tái tạo vector:
 
 $$D_{\text{MSE}} = \mathbb{E}\big[\, \lVert x - \hat{x} \rVert_2^2 \,\big].$$
 
@@ -43,7 +43,7 @@ Trong rất nhiều ứng dụng, thứ ta thực sự cần không phải là $
 
 $$\langle q, x \rangle \;\approx\; \langle q, \hat{x} \rangle.$$
 
-Đây chính xác là thứ xảy ra trong **Attention**: điểm số attention là $\langle q_{\text{query}}, k_{\text{key}} \rangle$, và đầu ra là tổ hợp $\sum_i a_i v_i$ — đều là tích vô hướng với các vector Key/Value đã nén. Tương tự, **Maximum Inner Product Search (MIPS)** trong vector database cũng đo bằng tích vô hướng.
+Đây chính xác là thứ xảy ra trong **Attention**: điểm số attention là $\langle q_{\text{query}}, k_{\text{key}} \rangle$, và đầu ra là tổ hợp $\sum_i a_i v_i$ - đều là tích vô hướng với các vector Key/Value đã nén. Tương tự, **Maximum Inner Product Search (MIPS)** trong vector database cũng đo bằng tích vô hướng.
 
 > [!IMPORTANT]
 > **Điểm mấu chốt mà TurboQuant phát hiện**: Một quantizer tối ưu cho MSE **chưa chắc** tốt cho inner product. Cụ thể, quantizer tối ưu MSE thường tạo ra **thiên lệch (bias)**: $\mathbb{E}[\langle q, \hat{x}\rangle] \neq \langle q, x\rangle$. Bias này tích lũy và làm hỏng ước lượng attention. Bài 4 sẽ giải quyết bằng QJL.
@@ -59,7 +59,7 @@ $$\boxed{D(R) = \sigma^2 \, 2^{-2R}}$$
 trong đó $R$ là số bit trên mỗi chiều. Đây là công thức nền tảng mà chúng ta sẽ tham chiếu xuyên suốt:
 
 * **Quy luật 6 dB/bit**: mỗi bit thêm vào giảm méo đi $4\times$ (tức $-6$ dB). Đây là "tỷ giá hối đoái" giữa bộ nhớ và chất lượng.
-* Tại sao Gauss lại quan trọng? Vì — như Bài 2 sẽ chỉ ra — **sau khi xoay ngẫu nhiên**, mỗi tọa độ của vector trở nên xấp xỉ Gauss. Đây là lý do TurboQuant "ép" dữ liệu về dạng Gauss để áp dụng lý thuyết đẹp đẽ này.
+* Tại sao Gauss lại quan trọng? Vì - như Bài 2 sẽ chỉ ra - **sau khi xoay ngẫu nhiên**, mỗi tọa độ của vector trở nên xấp xỉ Gauss. Đây là lý do TurboQuant "ép" dữ liệu về dạng Gauss để áp dụng lý thuyết đẹp đẽ này.
 
 ---
 
@@ -85,12 +85,12 @@ Lượng hóa **cả khối $d$ chiều cùng lúc**, dùng một codebook gồm
 
 Nếu VQ luôn tốt hơn, vì sao không ai dùng VQ thuần? Vì **chi phí**:
 1. **Indexing/Training đắt đỏ**: phải chạy K-means trên toàn bộ dữ liệu (hàng giờ với dataset lớn).
-2. **Phụ thuộc dữ liệu (data-dependent)**: codebook học từ một phân phối; khi dữ liệu đổi (distribution shift) thì méo tăng vọt — **không dùng được online**.
+2. **Phụ thuộc dữ liệu (data-dependent)**: codebook học từ một phân phối; khi dữ liệu đổi (distribution shift) thì méo tăng vọt - **không dùng được online**.
 3. **Tra cứu chậm**: với KV Cache sinh ra token-by-token, ta không thể chạy K-means lại sau mỗi token.
 
 > 🧠 **Câu hỏi trung tâm của TurboQuant**: *Liệu có cách nào đạt được chất lượng gần như VQ tối ưu, nhưng với chi phí gần như bằng 0 và hoàn toàn data-oblivious (online) như SQ?*
 >
-> **Câu trả lời**: Có — bằng cách **xoay ngẫu nhiên rồi lượng hóa vô hướng**. Đó là toàn bộ ý tưởng của TurboQuant, sẽ được trình bày từ Bài 2.
+> **Câu trả lời**: Có - bằng cách **xoay ngẫu nhiên rồi lượng hóa vô hướng**. Đó là toàn bộ ý tưởng của TurboQuant, sẽ được trình bày từ Bài 2.
 
 ---
 
@@ -98,8 +98,8 @@ Nếu VQ luôn tốt hơn, vì sao không ai dùng VQ thuần? Vì **chi phí**:
 
 * Quantization là cân bằng giữa **Rate** $R$ và **Distortion** $D$.
 * Có **hai loại distortion**: MSE (tái tạo vector) và Inner Product (attention/MIPS). TurboQuant lo cả hai.
-* Cận Shannon cho nguồn Gauss: $D(R) = \sigma^2 2^{-2R}$ — quy luật **6 dB/bit**.
+* Cận Shannon cho nguồn Gauss: $D(R) = \sigma^2 2^{-2R}$ - quy luật **6 dB/bit**.
 * **VQ tốt hơn SQ** nhờ space-filling + shape gain, nhưng **đắt và data-dependent**.
 * TurboQuant tìm cách "ăn gian": **xoay ngẫu nhiên** để biến bài toán VQ khó thành nhiều bài toán SQ dễ, mà vẫn gần tối ưu.
 
-👉 Bài tiếp theo: **[Bài 1 — Bài toán nén KV Cache & yêu cầu Data-Oblivious](./lesson_1_kv_cache_problem.md)**, đặt TurboQuant vào đúng bối cảnh ứng dụng nóng nhất của nó.
+👉 Bài tiếp theo: **[Bài 1 - Bài toán nén KV Cache & yêu cầu Data-Oblivious](./lesson_1_kv_cache_problem.md)**, đặt TurboQuant vào đúng bối cảnh ứng dụng nóng nhất của nó.
